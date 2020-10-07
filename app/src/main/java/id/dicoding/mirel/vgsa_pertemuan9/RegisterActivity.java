@@ -1,7 +1,10 @@
 package id.dicoding.mirel.vgsa_pertemuan9;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.Toolbar;
@@ -13,11 +16,13 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    private static final String FILENAME = "login";
     EditText editUsername, editPassword, editEmail, editNamaLengkap, editAsalSekolah, editAlamat;
-    Button btnSimpan;
 
 
     @Override
@@ -25,56 +30,52 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Register");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        getSupportActionBar().setTitle("Register");
         editUsername = findViewById(R.id.editUsername);
         editPassword = findViewById(R.id.editPassword);
         editEmail = findViewById(R.id.editEmail);
         editNamaLengkap = findViewById(R.id.editNamaLengkap);
         editAsalSekolah = findViewById(R.id.editAsalSekolah);
         editAlamat = findViewById(R.id.editAlamat);
-        btnSimpan = findViewById(R.id.btnSimpan);
-        btnSimpan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isValidation()) {
-                    simpanFileData();
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Mohon Lengkapi Seluruh Data", Toast.LENGTH_SHORT).show();
-                }
+
+    }
+    public void btn(View v){
+        if(v.getId() == R.id.btnSimpan){
+            if(input()){
+                simpan();
+            }else{
+                toas("Semua Data Harus Diisi!");
             }
-        });
-    }
-
-    boolean isValidation() {
-        if (editUsername.getText().toString().equals("") ||
-                editPassword.getText().toString().equals("") || editEmail.getText().toString().equals("") || editNamaLengkap.getText().toString().equals("") || editAsalSekolah.getText().toString().equals("") || editAlamat.getText().toString().equals("")) {
-            return false;
-        } else {
-            return true;
         }
+
     }
 
-    void simpanFileData() {
-        String isiFile = editUsername.getText().toString() + ";" + editPassword.getText().toString() + ";" + editEmail.getText().toString() + ";" + editNamaLengkap.getText().toString() + ";" + editAsalSekolah.getText().toString() + ";" + editAlamat.getText().toString();
-        File file = new File(getFilesDir(), editUsername.getText().toString());
+    private void simpan() {
+        String dataFile = editUsername.getText()+";"+editPassword.getText()+";"+editEmail.getText()+";"+editNamaLengkap.getText()+";"+editAsalSekolah.getText()+";"+editAlamat.getText();
+        File file = new File(getFilesDir(),FILENAME);
+        FileOutputStream output;
 
-        FileOutputStream outputStream = null;
         try {
             file.createNewFile();
-            outputStream = new FileOutputStream(file, false);
-            outputStream.write(isiFile.getBytes());
-            outputStream.flush();
-            outputStream.close();
-        } catch (Exception e) {
+            output = new FileOutputStream(file,false);
+            output.write(dataFile.getBytes());
+            output.flush();
+            output.close();
+            toas("berhasil register silahkan Login");
+
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        Toast.makeText(this, "Register Berhasil", Toast.LENGTH_SHORT).show();
-        onBackPressed();
+    }
+
+    private boolean input (){
+        return !editUsername.getText().toString().equals("") && !editPassword.getText().toString().equals("") && !editEmail.getText().toString().equals("") &&
+                !editNamaLengkap.getText().toString().equals("") && !editAsalSekolah.getText().toString().equals("") && !editAlamat.getText().toString().equals("");
+    }
+    void toas(String isi){
+        Toast.makeText(getApplicationContext(),isi,Toast.LENGTH_SHORT).show();
     }
 }

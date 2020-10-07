@@ -2,7 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <item android:title="Logouut"
-        android:id="@+id/action_logout"
+    <item android:title="Edit Profile"
+        android:id="@+id/editmenu"/>
+    <item android:title="Hapus Profile"
+        android:id="@+id/hapusmenu"/>
+    <item android:title="Logout"
+        android:id="@+id/logoutmenu"
         />
 </menu>

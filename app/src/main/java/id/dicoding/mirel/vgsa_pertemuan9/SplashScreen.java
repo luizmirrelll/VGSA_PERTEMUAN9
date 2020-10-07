@@ -20,11 +20,11 @@ public static String FILENAME = "login";
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (isLogin()){
-                    Intent intent =new Intent(SplashScreen.this,MainActivity.class);
+                if(isLogin()){
+                    Intent intent= new Intent(SplashScreen.this,MainActivity.class);
                     startActivity(intent);
                 }else {
-                    Intent intent =new Intent(SplashScreen.this,LoginActivity.class);
+                    Intent intent = new Intent(SplashScreen.this,LoginActivity.class);
                     startActivity(intent);
                 }
                 finish();

@@ -1,5 +1,6 @@
 package id.dicoding.mirel.vgsa_pertemuan9;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -20,103 +21,70 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-    EditText editUsername, editPassword, editEmail, editNamaLengkap, editAsalSekolah, editAlamat;
+    EditText editUsername;
+    String editPassword;
+    EditText editEmail;
+    EditText editNamaLengkap;
+    EditText editAsalSekolah;
+    EditText editAlamat;
     Button btnSimpan;
-    TextView textViewPassword;
 
     public static final String FILENAME = "login";
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-
-        getSupportActionBar().setTitle("Halaman Depan");
-
-        editUsername = findViewById(R.id.editUsername);
-        textViewPassword = findViewById(R.id.textViewPassword);
-        editPassword = findViewById(R.id.editPassword);
-        editEmail = findViewById(R.id.editEmail);
-        editNamaLengkap = findViewById(R.id.editNamaLengkap);
-        editAsalSekolah = findViewById(R.id.editAsalSekolah);
-        editAlamat = findViewById(R.id.editAlamat);
-        btnSimpan = findViewById(R.id.btnSimpan);
-
-        btnSimpan.setVisibility(View.GONE);
-        editUsername.setEnabled(false);
-        editPassword.setVisibility(View.GONE);
-        textViewPassword.setVisibility(View.GONE);
-        editEmail.setEnabled(false);
-        editNamaLengkap.setEnabled(false);
-        editAsalSekolah.setEnabled(false);
-
-        editAlamat.setEnabled(false);
-
-        bacaFileLogin();
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Halaman Depan");
+        btnSimpan = findViewById(R.id.btnSave);
+        editUsername = findViewById(R.id.inputUser);
+        editEmail = findViewById(R.id.inputEmail);
+        editNamaLengkap = findViewById(R.id.inputNama);
+        editAsalSekolah = findViewById(R.id.inputSekolah);
+        editAlamat = findViewById(R.id.inputAlamat);
+        masukanData();
     }
 
-    void bacaFileLogin() {
-        File sdcard = getFilesDir();
-        File file = new File(sdcard, FILENAME);
-        if (file.exists()) {
+    private void masukanData() {
+        File file = new File(getFilesDir(),FILENAME);
+        if(file.exists()){
             StringBuilder text = new StringBuilder();
+
             try {
-                BufferedReader br =
-                        new BufferedReader(new FileReader(file));
+                BufferedReader br = new BufferedReader(new FileReader(file));
                 String line = br.readLine();
-                while (line != null) {
+                while (line != null){
                     text.append(line);
                     line = br.readLine();
                 }
+                String[] data = text.toString().split(";");
                 br.close();
+                editUsername.setText(data[0]);
+                editPassword = data[1];
+                editEmail.setText(data[2]);
+                editNamaLengkap.setText(data[3]);
+                editAsalSekolah.setText(data[4]);
+                editAlamat.setText(data[5]);
+
+
             } catch (IOException e) {
-                System.out.println("Error " + e.getMessage());
+                e.printStackTrace();
             }
-            String data = text.toString();
-            String[] dataUser = data.split(";");
-            bacaDataUser(dataUser[0]);
 
+
+        }else{
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
         }
-    }
 
-    void bacaDataUser(String fileName) {
-        File sdcard = getFilesDir();
-        File file = new File(sdcard, fileName);
-        if (file.exists()) {
-            StringBuilder text = new StringBuilder();
-            try {
-                BufferedReader br =
-                        new BufferedReader(new FileReader(file));
-                String line = br.readLine();
-                while (line != null) {
-                    text.append(line);
-                    line = br.readLine();
-                }
-                br.close();
-            } catch (IOException e) {
-                System.out.println("Error " + e.getMessage());
-            }
-            String data = text.toString();
-            String[] dataUser = data.split(";");
-
-            editUsername.setText(dataUser[0]);
-            editEmail.setText(dataUser[2]);
-            editNamaLengkap.setText(dataUser[3]);
-            editAsalSekolah.setText(dataUser[4]);
-            editAlamat.setText(dataUser[5]);
-
-        } else {
-            Toast.makeText(this, "User Tidak Ditemukan",
-                    Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
@@ -124,38 +92,101 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                tampilkanDialogKonfirmasiLogout();
+        switch (item.getItemId()){
+            case R.id.editmenu:
+                profiledit();
+                break;
+            case R.id.hapusmenu:
+                hapus();
+                break;
+            case R.id.logoutmenu:
+                logout();
                 break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
+    private void hapus() {
+        new AlertDialog.Builder(this).setTitle("Hapus Data Profile")
+                .setMessage("Apkah Anda Yakin untuk Menghapus Data Profile? data yang sudah di hapus tidak dapat di kembalikan!")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes,
+                        new DialogInterface.OnClickListener(){
 
-    void hapusFile() {
-        File file = new File(getFilesDir(), FILENAME);
-        if (file.exists()) {
+                            public void onClick(DialogInterface dialog, int which) {
+                                hapusData();
+                            }
+                        }).setNegativeButton(android.R.string.no,null).show();
+    }
+    private  void  hapusData(){
+        File file = new File(getFilesDir(),FILENAME);
+        if(file.exists()){
             file.delete();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+
         }
     }
-
-    void tampilkanDialogKonfirmasiLogout() {
-        new AlertDialog.Builder(this)
-                .setTitle("Logout")
-                .setMessage("Apakah Anda yakin ingin Logout?")
+    private void logout() {
+        new AlertDialog.Builder(this).setTitle("Logout")
+                .setMessage("Apkah Anda Yakin untuk Logout?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton(android.R.string.yes,
+                        new DialogInterface.OnClickListener(){
 
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        hapusFile();
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null).show();
+                            public void onClick(DialogInterface dialog, int which) {
+                                System.exit(0);
+                            }
+                        }).setNegativeButton(android.R.string.no,null).show();
+    }
+
+    private void profiledit() {
+        editUsername.setEnabled(true);
+        editEmail.setEnabled(true);
+        editNamaLengkap.setEnabled(true);
+        editAsalSekolah.setEnabled(true);
+        editAlamat.setEnabled(true);
+        btnSimpan.setVisibility(View.VISIBLE);
+    }
+
+    public void btn(View view) {
+        if(view.getId() == btnSimpan.getId()){
+            update();
+        }
+    }
+    void  update(){
+        new AlertDialog.Builder(this).setTitle("Update Profile")
+                .setMessage("Apkah Anda Yakin untuk Mengedit Profile anda?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes,
+                        new DialogInterface.OnClickListener(){
+
+                            public void onClick(DialogInterface dialog, int which) {
+                                simpan();
+                            }
+                        }).setNegativeButton(android.R.string.no,null).show();
+    }
+    private void simpan() {
+        String dataFile = editUsername.getText()+";"+editPassword+";"+editEmail.getText()+";"+editNamaLengkap.getText()+";"+editAsalSekolah.getText()+";"+editAlamat.getText();
+        File file = new File(getFilesDir(),FILENAME);
+        FileOutputStream output;
+        try {
+
+            output = new FileOutputStream(file,false);
+            output.write(dataFile.getBytes());
+            output.flush();
+            output.close();
+            Toast.makeText(getApplicationContext(),"Profile Sudah Di Update",Toast.LENGTH_SHORT).show();
+            editUsername.setEnabled(false);
+            editEmail.setEnabled(false);
+            editNamaLengkap.setEnabled(false);
+            editAsalSekolah.setEnabled(false);
+            editAlamat.setEnabled(false);
+            btnSimpan.setVisibility(View.GONE);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

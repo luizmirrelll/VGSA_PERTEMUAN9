@@ -51,54 +51,50 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    void simpanFileLogin() {
-        String isiFile = editUsername.getText().toString() + ";" + editPassword.getText().toString();
-        File file = new File(getFilesDir(), FILENAME);
-
-        FileOutputStream outputStream = null;
-        try {
-            file.createNewFile();
-            outputStream = new FileOutputStream(file, false);
-            outputStream.write(isiFile.getBytes());
-            outputStream.flush();
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+    void tombolpindah(View v){
+        if (v.getId()== R.id.action_login) {
+            login();
+        }else  if (v.getId()==R.id.action_register){
+            register();
         }
-        Toast.makeText(this, "Login Berhasil", Toast.LENGTH_SHORT).show();
-        onBackPressed();
     }
 
     void login() {
-        File sdcard = getFilesDir();
-        File file = new File(sdcard, editUsername.getText().toString());
-        if (file.exists()) {
+        File file = new File(getFilesDir(),FILENAME);
+        if(file.exists()) {
             StringBuilder text = new StringBuilder();
+
             try {
-                BufferedReader br =
-                        new BufferedReader(new FileReader(file));
+                BufferedReader br = new BufferedReader(new FileReader(file));
                 String line = br.readLine();
+
                 while (line != null) {
                     text.append(line);
                     line = br.readLine();
                 }
+                String[] data = text.toString().split(";");
                 br.close();
-            } catch (IOException e) {
-                System.out.println("Error " + e.getMessage());
-            }
-            String data = text.toString();
-            String[] dataUser = data.split(";");
+                //cek login disini
 
-            if (dataUser[1].equals(editPassword.getText().toString())) {
-                simpanFileLogin();
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }else {
-                Toast.makeText(this, "Password Tidak Sesuai", Toast.LENGTH_SHORT).show();
+
+                if(editUsername.getText().toString().equals(data[0]) && editPassword.getText().toString().equals(data[1])){
+                    //masuk ke main activity
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+
+                }else {
+                    Toast.makeText(getApplicationContext(),"Usernam Atau Password Salah!",Toast.LENGTH_SHORT).show();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } else {
-            Toast.makeText(this, "User Tidak Ditemukan", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getApplicationContext(),"Data Tidak Ditemukan Silahkan Regiter Terlebih Dahulu!",Toast.LENGTH_SHORT).show();
         }
+    }
+    void register(){
+        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
