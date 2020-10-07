@@ -40,8 +40,8 @@ public class RegisterActivity extends AppCompatActivity {
         editAlamat = findViewById(R.id.editAlamat);
 
     }
-    public void btn(View v){
-        if(v.getId() == R.id.btnSimpan){
+    public void tombol(View v){
+        if(v.getId() == R.id.simpan){
             if(input()){
                 simpan();
             }else{
@@ -63,7 +63,6 @@ public class RegisterActivity extends AppCompatActivity {
             output.flush();
             output.close();
             toas("berhasil register silahkan Login");
-
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
         } catch (IOException e) {
