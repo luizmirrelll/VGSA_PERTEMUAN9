@@ -28,6 +28,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login);
         editUsername = findViewById(R.id.editUsername);
         editPassword = findViewById(R.id.editPassword);
         btnLogin = findViewById(R.id.action_login);
@@ -99,6 +101,4 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "User Tidak Ditemukan", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
-
