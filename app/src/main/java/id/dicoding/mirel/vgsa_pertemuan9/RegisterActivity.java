@@ -40,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
         editAlamat = findViewById(R.id.editAlamat);
 
     }
-    public void tombol(View v){
+    public void button(View v){
         if(v.getId() == R.id.simpan){
             if(input()){
                 simpan();
